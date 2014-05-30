@@ -1,0 +1,87 @@
+Iterators
+Go Library Design
+22 May 2014
+
+Kevin Gillette
+https://github.com/extemporalgenome
+https://github.com/xtgo
+
+* Why?
+
+- Your code supplies variable-length data
+- But doesn't consume it
+- The internal data representation may be awkward
+
+* Iterator Styles
+
+* Slice/Map Passing
+
+  func Source() []T
+  for _, val := range Source() { }
+
+- Fastest... if you already have the data
+- Impractical when the data must be fetched or augmented
+- Can expose a batching API to mitigate above issues
+- ... but batching APIs can complicated
+- io.Reader is a batching API that works well
+- (though the stdlib does [almost] everything for you)
+
+* Channels
+
+  func Source() <-chan T
+  for val := range Source() { }
+
+- Currently the slowest option
+- The scheduler may get faster
+- Moot: APIs that expose channels are rarely idiomatic
+
+.link http://talks.golang.org/2013/bestpractices.slide#25
+
+* Closure "Trampoline"
+
+Explicit "turtles all the way down" closure approach:
+
+  type Iter func() (T, Iter)
+  iter := GetIter()
+  for val, iter := iter(); iter != nil; val, iter = iter() { }
+
+Using closures to hide the existence of closures (magic):
+
+  type Iter func() (T, bool)
+  iter := GetIter()
+  for val, ok := iter(); ok; val, ok = iter() { }
+
+- Trades readability/sanity for a "prettier" 3-clause for loop
+- Slower than you'd like, and takes a lot of library code to achieve
+- Discovered by Steven Blenkinsop and others; rarely used in practice
+
+.link https://groups.google.com/d/msg/golang-nuts/JofOJnHUXBg/LB0qVvwuZeIJ
+
+* Methods
+
+  // <insert typical OOP iterator approach here>
+
+- Works well for `bufio.Scanner`
+- ... but rarely works well otherwise
+- Often used in languages with direct support for an iterator interface
+- Go takes a strong stance on not special-casing any specific interfaces on the _language_ level
+
+* Callbacks
+
+  Iter(func(val T) (more bool) { return true })
+
+- Most efficient option for indeterminate-length, non-concurrent sources
+- More idiomatic than channels for building APIs
+- Non-magical; it's simple, concise, and well understood
+- path/filepath's Walk is a good example
+
+* Relative Iteration Overhead
+
+.html iter/overhead.html
+
+.link https://github.com/extemporalgenome/iterbench
+
+- Tested on 1.6ghz Intel Atom netbook, GOMAXPROCS=1
+- Dataset is slice/map with 16384 int elements
+- []int channel iteration figures correspond to 1024-buffered chan and an unbuffered chan, respectively
+- map iteration performance was not adversely affected by chan buffering
