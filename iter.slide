@@ -3,8 +3,8 @@ Go Library Design
 22 May 2014
 
 Kevin Gillette
-https://github.com/extemporalgenome
 https://github.com/xtgo
+https://github.com/extemporalgenome
 
 * Why?
 
@@ -84,7 +84,7 @@ Using closures to hide the existence of closures (magic):
 
 .link https://github.com/extemporalgenome/iterbench
 
-- Figures relative to `Loop` speed of the same row; rows are not interrelated.
+- Figures relative to `Loop` speed of the same row; rows are not interrelated
 - Tested on 1.6ghz Intel Atom netbook, GOMAXPROCS=1
 - Dataset is slice/map with 16384 int elements
 - []int channel iteration figures correspond to 1024-buffered chan and an unbuffered chan, respectively
