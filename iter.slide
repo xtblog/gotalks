@@ -77,10 +77,14 @@ Using closures to hide the existence of closures (magic):
 
 * Relative Iteration Overhead
 
-.html iter/overhead.html
+  Type              Loop  Callback  Closure   Channel
+  ----------------  ----  --------  -------  ---------
+  []int              1x      11x      22x     291-866x
+  map[int]struct{}   1x      ~1x      10x           9x
 
 .link https://github.com/extemporalgenome/iterbench
 
+- Figures relative to `Loop` speed of the same row; rows are not interrelated.
 - Tested on 1.6ghz Intel Atom netbook, GOMAXPROCS=1
 - Dataset is slice/map with 16384 int elements
 - []int channel iteration figures correspond to 1024-buffered chan and an unbuffered chan, respectively
