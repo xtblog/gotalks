@@ -1,0 +1,38 @@
+lwa
+Local Web Application
+26 Jun 2014
+
+Kevin Gillette
+https://github.com/xtgo
+https://github.com/extemporalgenome
+
+* Background
+
+- Web applications are supplanting desktop applications in many cases
+- Web tech is intrinsically portable, and for many users is the new 'native'
+- Complex layout capabilities are first class
+- Separation of code and presentation has existed for nearly two decades
+- Local applications will continue to be important in a variety of roles
+
+* Enter lwa
+
+.link https://github.com/xtgo/lwa
+
+  func Serve(handler http.Handler) error
+
+- Serves http on a random localhost port
+- Spawns an app-style browser window pointing at that port
+- Only requests originating from the app window are permitted
+- Serve returns with nil error when app window is closed
+
+* Demo
+
+- Didn't have time for a demo
+- But it's just like the web, except locally hosted!
+
+* Followup thoughts
+
+- Embedded databases are fun and applicable here
+- Usually single-file; no client/server model
+- File based permission system (e.g. 0600)
+- Packaging files into the binary -- appending a zip container is one approach
