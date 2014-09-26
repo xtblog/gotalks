@@ -49,7 +49,7 @@ https://github.com/extemporalgenome
 
 * Use cases
 
-- Generic code via code generation
+- Generic code via code generation: sort.Interface implementations, concrete "container/list" alternatives
 - Stuffing binary files in Go string constants
 - Inspecting version control repositories and storing revisions in a version.go file
 
