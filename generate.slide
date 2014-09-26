@@ -1,0 +1,58 @@
+go generate
+Code generation lands in the toolchain
+25 Sep 2014
+
+Kevin Gillette
+https://github.com/xtgo
+https://github.com/extemporalgenome
+
+* Introduction
+
+- Official toolchain support for code generation in Go 1.4
+- Available right now on tip
+- Intended for use by package authors only
+- Not part of build process -- it's part of the development process
+
+* Running generate
+
+  go generate [-run regexp] [file.go...|packagepath...]
+
+- `go generate` without arguments will scan all Go files in sorted filename order
+- generate directives within files will be run one after another, from top to bottom
+- Any errors processing any directive will cease all further processing
+
+* Directives
+
+  package library
+
+  //go:generate program -o output.go args...
+
+- Typical usage will involve commands which take an explicit output file argument
+- stdio streams aren't redirected -- you need some way to specify where output will end up
+- generate directive comments must start at the beginning of the line
+
+* Shorthand directives
+
+  package library
+
+  //go:generate -command say echo one two
+
+  //go:generate say three four
+
+- Running generate on the above will produce `one two three four` in the tool output
+- Shorthand directives will be accessible in the remainder of that file only
+- Shorthand directives are not recursive, so the following is fine:
+
+  //go:generate -command echo echo one two
+
+  //go:generate echo three four
+
+* Use cases
+
+- Generic code via code generation
+- Stuffing binary files in Go string constants
+- Inspecting version control repositories and storing revisions in a version.go file
+
+* Further Reading
+
+.link http://golang.org/s/go1.4-generate
