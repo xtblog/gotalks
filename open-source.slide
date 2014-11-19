@@ -50,6 +50,12 @@ https://github.com/xtgo
 
 .link http://blog.golang.org/cover
 
+* Stability
+
+- If your API is subject to change, mention it in the README
+- Once your package is stable, don't break backwards compatibility
+- If you need to break compatibility, host the new version under a different import path
+
 * Miscellanea
 
 - CI testing, coverage analysis, etc. are often free for open source projects
