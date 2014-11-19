@@ -1,0 +1,62 @@
+Open Source Go Library Development
+Things to Remember
+18 Nov 2014
+
+Kevin Gillette
+https://github.com/xtgo
+
+* LICENSE
+
+- Include a `LICENSE` file. Just do
+- If you don't, nobody can or will use your library
+- With some licenses, the file may be named `COPYING` (e.g. GPL)
+- Consider license compatibility if you care about wide-spread adoption
+- Consider license compatibility if you care about compliance
+
+* README
+
+- Include a `README` file, even if it only contains a `godoc.org` link
+- Potential users may consider your package unready if it lacks a `README`
+- GitHub, BitBucket, and others support a Markdown formatted `README.md`
+- Focus on documenting the code; the README shouldn't be the primary reference
+
+* Package Style & Documentation
+
+- `gofmt` your code. Just do
+- Plan to add a doc-comment to every exported function, type, and method
+- If any of your code explicitly panics, document it
+
+.link http://blog.golang.org/godoc-documenting-go-code
+
+* godoc.org
+
+- The best way to advertise your package
+- To index your library, just visit `godoc.org/<your-import-path>`
+- Works with anything go-gettable
+
+* Dependencies
+
+- Consider eliminating dependencies: large imports are unappealing
+- Prefer stdlib imports: 3rd party packages don't usually have the same guarantees
+
+* Testing & Sanity Checks
+
+.link http://golang.org/pkg/testing/#example_B_RunParallel
+
+- Example functions count as both tests and documentation
+- If you use concurrency, test with the -race flag
+- Run `go vet` at least once prior to publishing
+- Use `go test -cover` to review test coverage; be wary of untested edge cases
+
+.link http://blog.golang.org/cover
+
+* Miscellanea
+
+- CI testing, coverage analysis, etc. are often free for open source projects
+- Status badges are a popular to put in READMEs
+- Don't use static badges to indicate that builds/tests pass
+
+.link https://github.com/boltdb/bolt Badges Example
+.link https://drone.io
+.link https://coveralls.io
+.link http://shields.io
