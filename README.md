@@ -2,7 +2,7 @@
 
 Entries ordered by date of most recent presentation.
 
-## Iterators: Go Library Design
+## Iterators
 
 [Slides](https://go-talks.appspot.com/github.com/extemporalgenome/gotalks/iter.slide) | [Source](iter.slide)
 
@@ -14,19 +14,19 @@ Entries ordered by date of most recent presentation.
 
 - 2014 Jun 26, Denver
 
-## Effective Go Error Handling: Tricks and shortcuts you don't need a library for
+## Effective Go Error Handling
 
 [Slides](https://go-talks.appspot.com/github.com/extemporalgenome/gotalks/error-handling.slide) | [Source](error-handling.slide)
 
 - 2014 Sep 25, Denver
 
-## Open Source Go Library Development: Things to Remember
+## Open Source Go Library Development
 
 [Slides](https://go-talks.appspot.com/github.com/extemporalgenome/gotalks/open-source.slide) | [Source](open-source.slide)
 
 - 2014 Nov 18, Denver
 
-## `go generate`: Code generation lands in the toolchain
+## go generate
 
 [Slides](https://go-talks.appspot.com/github.com/extemporalgenome/gotalks/generate.slide) | [Source](generate.slide)
 
