@@ -88,6 +88,14 @@ https://github.com/extemporalgenome/gotalks
 
 - _Always_ loop over b.N; _Don't_ do anything like `make(T, b.N)`
 - Run with `go test -bench .` (the dot is a regexp matching benchmark names, i.e. "XYZ")
+
+* Benchmark Tips
+
 - Benchmarks will be run with a low b.N to start with
 - The test suite will rerun a benchmark with successively larger b.N values until it can measure away the b.N loop overhead and gain the necessary timing precision (hardware timers often have worse precision than the operation being benchmarked)
 - The `go test` tool has a lot of thought (and maths!) put into benchmark running, so just let it do its job (especially if you're used to specifying iteration counts yourself)
+
+* Further Reading
+
+.link http://blog.golang.org/profiling-go-programs Go Blog Profiling Article
+.link https://blog.golang.org/cover Go Blog Coverage Article
