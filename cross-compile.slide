@@ -33,6 +33,23 @@ https://github.com/extemporalgenome/gotalks
 - `GOOS=windows go build` -- Windows, same arch
 - `GOOS=linux GOARCH=arm go build` -- Android, RPi, the upcoming CHIP
 
+* Platform-Specific Code
+
+- Code in Go is by default platform-agnostic; try to keep it this way
+- The Go tool recognizes platform-specific code in filenames
+- `name_$GOOS_$GOARCH.go` `name_$GOOS.go` `name_$GOARCH.go` -- e.g. strutil_linux_arm.go
+- Alternatively, build constraint comments can also be used:
+
+  // +build linux darwin
+  // +build 386,!customtag
+
+  // package doc
+  package xyz
+
+- (linux OR darwin) AND (386 AND NOT customtag)
+- `go build -tag customtag` will _not_ include the above snippet in the build
+- `// +build ignore` is a _conventional_ way to always exclude a file from building
+
 * Cross Compilation in Go 1.4.x and Earlier: Theory
 
 - There must be a version of the low-level toolchain for every desired target
