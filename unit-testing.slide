@@ -72,7 +72,7 @@ https://github.com/extemporalgenome/gotalks
 - stdout is checked against the comment, after normalizing whitespace
 - Serves as interactive documentation which won't get stale, because it's also a test
 
-.link http://golang.org/pkg/strings#ExampleFields
+.link http://golang.org/pkg/strings/#example_Fields
 
 - Special cases for handling package-wide and more complex examples
 
