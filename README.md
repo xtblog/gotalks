@@ -38,3 +38,9 @@ Entries ordered by date of most recent presentation.
 [Slides](https://go-talks.appspot.com/github.com/extemporalgenome/gotalks/cross-compile.slide) | [Source](cross-compile.slide)
 
 - 2015 May 13, DC
+
+## Unit Testing in Go
+
+[Slides](https://go-talks.appspot.com/github.com/extemporalgenome/gotalks/unit-testing.slide) | [Source](unit-testing.slide)
+
+- 2015 May 13, DC
