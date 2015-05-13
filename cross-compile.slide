@@ -1,0 +1,87 @@
+Cross-Compiling Go
+13 May 2015
+
+Kevin Gillette
+https://github.com/xtgo
+https://github.com/extemporalgenome/gotalks
+
+* Go
+
+- The official Go compiler is known as "gc" (always lowercase)
+- "GC" (in uppercase, often prefixed with "the", refers to the garbage collector)
+- gc compiles static binaries: self contained, depends only on the OS kernel (no other runtime dependencies, e.g. no libc)
+- High-level (user-facing) toolchain consists of the `go` command
+- Low-level toolchain consists of compiler, linker, assembler, etc.
+
+* Cross Compilation (1/3)
+
+- Producing machine code for a target that may differ from the compilation host
+- Often convenient, sometimes necessary (Go can run on some systems that don't have enough memory or storage to host the compiler)
+- Historical lack of foresight and bloated compiler design is the reason cross-compilation is uncommon or difficult with many compilers
+
+* Cross Compilation (2/3)
+
+- In contrast, gc is a thoroughly crossed compiler: all Go compilation is cross-compilation, even when compiling for the same machine
+- Why? How? gc running on darwin/amd64 building for itself is semantically identical to gc running on linux/arm building for darwin/amd64
+- gc doesn't care about the system it's running _on_, only the target it's building _for_
+
+* Cross Compilation (3/3)
+
+- `GOOS` and `GOARCH` environment variables are used by the `go` command to select the compile target
+- GO386 and GOARM handle sub-arch tuning for those platforms (default values will likely work for you)
+- `GOARCH=386 go build` -- current OS, 386 arch
+- `GOOS=windows go build` -- Windows, same arch
+- `GOOS=linux GOARCH=arm go build` -- Android, RPi, the upcoming CHIP
+
+* Cross Compilation in Go 1.4.x and Earlier: Theory
+
+- There must be a version of the low-level toolchain for every desired target
+- Compilers have names like 6g (amd64), 8g (386), 5g (arm)
+- Linkers have names like 6l, 8l, 5l
+- These "arch chars" are holdovers from gc's origins as the Plan 9 C compiler
+- "gc" actually refers to all of these in aggregate
+
+* Cross Compilation in Go 1.4.x and Earlier: Practice
+
+- With the official binary packages and Linux distro packages, compiling for other targets is typically not baked in
+- There are workarounds, but usually involve a lot of chown'ing
+- Building the compiler from source and storing it inside $HOME is flexible
+- `GOOS=pqr GOARCH=xyz ./make.bash --no-clean`
+- On OS X, `brew install go --cross-compile-all` will fetch the cross-compile variant
+- "--cross-compile-common" has compilers for the targets that most people need
+
+* Cross Compilation in Go 1.5: Theory & Practice
+
+- Two unified binaries, "compile" and "link" handle all targets
+- Low-level toolchain almost entirely rewritten in Go
+- Overall size of cross-build environment is much smaller
+- All binary distributions, distro packages, etc will have cross-compilation baked in
+- Day to day use (`GOOS` and `GOARCH`) does not change
+
+* Official Toolchain: OS/Arch Table
+
+  GOOS/GOARCH amd64 386 arm
+  ----------- ----- --- ---
+  darwin        x    x   *  In development (iOS)
+  dragonfly     x    x
+  freebsd       x    x   x
+  linux         x    x   x
+  nacl          *    x   x  amd64p32 (32-bit pointers)
+  netbsd        x    x   x
+  openbsd       x    x
+  plan9         x    x
+  solaris       x    x
+  windows       x    x
+
+* Alternative Compilers
+
+- gccgo is a Go compiler built on GCC, but cross-compilation may take effort
+- gccgo supports many of the architectures that GCC does, and is working on support for embedded and real-time use-cases
+- llgo is an in-development Go compiler built on clang/llvm. It is less mature, but has some unique targets (such as PNaCl)
+- gopherjs and tardisgo are transpilers (Go to other high-level languages)
+
+* Further Reading
+
+.link https://coderwall.com/p/pnfwxg/cross-compiling-golang OS X 1.4 Cross Compilation
+.link http://dave.cheney.net/2015/03/03/cross-compilation-just-got-a-whole-lot-better-in-go-1-5 Dave Cheney's 1.5 Cross-Compilation Article
+.link https://groups.google.com/d/msg/golang-dev/A2afjwMedq4/wXzNZJXYYH0J 1.5 Cross Compile Plan/Proposal
