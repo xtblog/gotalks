@@ -1,0 +1,93 @@
+Unit Testing in Go
+13 May 2015
+
+Kevin Gillette
+https://github.com/xtgo
+https://github.com/extemporalgenome/gotalks
+
+* Unit Testing
+
+- Test small pieces of code in isolation (usually individual functions)
+- Often undervalued compared to integration tests
+- Comparatively, unit tests are less brittle, more specific, much faster
+
+* Unit Testing in Go
+
+- Facilitated by the "testing" stdlib package, and the `go test` tool
+- Tests belong in files with names matching `*_test.go`
+- Platform specifiers in filenames go first: `math_amd64_test.go`
+- Test files can use the same package name, or can use name_test as a special case
+- The special case is useful if only the exported API is to be tested: the compiler will disallow use of unexported identifiers per the normal rules
+
+* Unit Test Example
+
+  package io_test
+  
+  // ... imports ...
+  
+  func TestSectionReader_Size(t *testing.T) {
+  	tests := []struct {
+  		data string
+  		want int64
+  	}{
+  		{"a long sample data, 1234567890", 30},
+  		{"", 0},
+  	}
+  
+  	for _, tt := range tests {
+  		r := strings.NewReader(tt.data)
+  		sr := NewSectionReader(r, 0, int64(len(tt.data)))
+  		if got := sr.Size(); got != tt.want {
+  			t.Errorf("Size = %v; want %v", got, tt.want)
+  		}
+  	}
+  }
+
+* Unit Test Tips (1/2)
+
+- `go test` runs these tests
+- "Table tests" (previous slide) are common, and test over a variety of inputs
+- Use the "Func(%v) = got; want" style (brains learn this convention just like brains learn to read gofmt'd code quickly)
+- Don't forget to test failures (inputs that the code should reject)
+
+* Unit Test Tips (2/2)
+
+- Unit tests are of the form: `func TestCamelCase(t *testing.T) { /* ... */ }`
+- This will be associated with an exported symbol (func, type, etc) named CamelCase
+- TypeName.Method can be tested with a name like TestTypeName_Method
+- Additional tests for a given symbol have the form TestGenPrime_slow
+
+* Example Test Example
+
+  package strings_test
+  
+  import "strings"
+  
+  func ExampleFields() {
+  	fmt.Printf("Fields are: %q", strings.Fields("  foo bar  baz   "))
+  	// Output: Fields are: ["foo" "bar" "baz"]
+  }
+
+- Name starts with Example, has `// Output: ...` at the end; can span multiple lines
+- stdout is checked against the comment, after normalizing whitespace
+- Serves as interactive documentation which won't get stale, because it's also a test
+
+.link http://golang.org/pkg/strings#ExampleFields
+
+- Special cases for handling package-wide and more complex examples
+
+* Benchmark Example
+
+  func BenchmarkXYZ(b *testing.B) {
+  	doSomeInitialization()
+  	b.ResetTimer()
+  	for i := 0; i < b.N; i++ {
+  		XYZ()
+  	}
+  }
+
+- _Always_ loop over b.N; _Don't_ do anything like `make(T, b.N)`
+- Run with `go test -bench .` (the dot is a regexp matching benchmark names, i.e. "XYZ")
+- Benchmarks will be run with a low b.N to start with
+- The test suite will rerun a benchmark with successively larger b.N values until it can measure away the b.N loop overhead and gain the necessary timing precision (hardware timers often have worse precision than the operation being benchmarked)
+- The `go test` tool has a lot of thought (and maths!) put into benchmark running, so just let it do its job (especially if you're used to specifying iteration counts yourself)
