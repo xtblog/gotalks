@@ -56,4 +56,5 @@ https://github.com/extemporalgenome
 
 * Further Reading
 
-.link http://golang.org/s/go1.4-generate
+.link https://blog.golang.org/generate Generate Blog Article
+.link http://golang.org/s/go1.4-generate Generate Tool Documentation
