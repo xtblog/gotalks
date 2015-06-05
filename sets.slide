@@ -1,0 +1,141 @@
+Sets and The Universal Type
+Safely solving more problems with the same language tools
+10 Jul 2015
+
+Kevin Gillette
+https://github.com/xtgo
+https://github.com/xtblog/gotalks
+
+* Sets (minimal theory)
+
+- A set is a collection of unique elements.
+- Membership testing: is element x in set A?
+- Other set operations (in terms of input sets A and B):
+
+    Union:                 elements in at least one of A or B
+    Intersection:          elements in both A and B
+    Symmetric Difference:  elements in either A or B but not both
+    Difference:            elements in A but not B
+
+- All of these operations _except_ Set Difference are associative and commutative.
+- Associativity: ((a + b) + c) == (a + (b + c))
+- Commutativity: (a + b) == (b + a)
+
+* Sets in Go: the typical approach
+
+- Often implemented as `map[T]struct{}`
+- The keys of the map are the elements of the set.
+- Great for checking membership; poor average-case performance otherwise.
+
+* Implications
+
+- DRY? `interface{}` implementations ubiquitous, not type safe.
+- `reflect.MakeFunc` could be cleaner, but merely hides the type-chaos.
+- Code-gen is incompatible with eventual plugin approaches, can cause bloat.
+- These approaches dump fuel on the "generics" fire.
+
+* Sorting in Go
+
+- Polymorphic, type-safe, single algorithm implementation. But how?
+- Interfaces, implemented on the collection, not the element.
+- The methods parameters and return values are all concrete types (important!)
+
+    type Interface interface {
+        Len() int
+        Less(i, j int) bool
+        Swap(i, j int)
+    }
+
+.link http://golang.org/pkg/sort/#Interface
+
+* The Universal Type (1/2)
+
+- Sorting is necessarily based around the concept of order.
+- Any fully-ordered collection can be enumerated.
+- In Go, this is conventionally expressed using the `int` type.
+- `int` represents an index; it is a proxy for the real value (brilliant!)
+
+    type IntSlice []int
+
+    func (p IntSlice) Len() int           { return len(p) }
+    func (p IntSlice) Less(i, j int) bool { return p[i] < p[j] }
+    func (p IntSlice) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
+
+.link http://golang.org/pkg/sort/#IntSlice
+
+* The Universal Type (2/2)
+
+- An ordering can be defined on sets too.
+- Nearly all practical sets have order defined on the element type anyway.
+- Example: sets of ints, sets of strings, etc.
+
+* Sets in Go: a different approach (1/4)
+
+.link https://github.com/xtgo/set
+
+- Every `sort.Interface` implementation is implicitly a set implementation.
+- `sort.Sort` and `set.Uniq` sanitize arbitrary inputs.
+- `set.Union` and friends implement the set operations.
+- Absolutely _no_ reflection, type assertions, empty interfaces, code generation.
+
+* Sets in Go: a different approach (2/4)
+
+    func SymDiff(data sort.Interface, pivot int) (size int)
+
+- `pivot` delimits the two input sets
+- Set A is `data[0:pivot]`, set B is `data[pivot:data.Len()]`
+- Result will be occupy `data[0:size]`
+
+.play sets/symdiff.go /BEGIN/,/END/
+
+* Sets in Go: a different approach (3/4)
+
+- These op functions expect sorted, duplicate-free inputs...
+- ... rearrange elements using efficient, in-place merge algorithms...
+- ... return the size of the resulting set (which will be sorted and duplicate-free)
+
+* Sets in Go: a different approach (4/4)
+
+    type Op func(data sort.Interface, pivot int) (size int)
+
+    func Apply(op Op, data sort.Interface, pivots []int) (size int)
+
+- Concurrent, adaptive application of `op` to all of the input sets.
+- `op` must be semantically associative; doc examples show  `set.Diff` approach.
+
+.play sets/apply.go /BEGIN/,/END/
+
+* Good in theory, but in practice? (1/2)
+
+- Doesn't allocate internally (map implementations do).
+- Much faster than map-based algorithms for set-to-set operations.
+- Map-based algos get slower with set size; no so for the `set.*` algorithms.
+- App can use hybrid slice+map type to make membership checks constant-time.
+- TODO: will be made even faster by baking in binary search to detect runs.
+- TODO: set.Union and set.SymDiff currently use multi-pass implementations (reasonable speed) -- these will get replaced with much faster, single pass techniques like set.Inter and set.Diff already use.
+
+* Good in theory, but in practice? (2/2)
+
+    BenchmarkInter32            199 ns/op     1 allocs/op
+    BenchmarkMapInter32        5530 ns/op     6 allocs/op
+    BenchmarkInter64K        214941 ns/op     1 allocs/op
+    BenchmarkMapInter64K   10522886 ns/op   370 allocs/op
+
+- 1x alloc is from test, not library code. `BenchmarkInter*` correspond to sort.Interface-based algorithms.
+- `BenchmarkMap*` correspond to straightforward, concrete map[int]struct{} algorithms.
+- Because the language only provides one way to iterate over maps (and because they're unordered), the naive implementations are about as good as you can get with maps (without having unsafe access to the map internals).
+
+* Additional Possibilities
+
+- Many data-structures with a definable order could have sort-style algorithms.
+- `[]int` is a good surrogate data-structure that can be used to form more complex algorithms on top of "concrete method" interfaces.
+- ex: merge sort and specialized sorts API-compatible with `sort.Sort`.
+
+.play sets/shuffle.go /BEGIN/,$
+
+* Additional Possibilities: container/list
+
+- container/list uses of `interface{}` could have been `pivot` and `size` ints.
+- Pivots would allow batch pushes and pops -- potentially more efficient.
+- Type assertions go away as do redundant method requirements.
+- Ergo, all sort.Interface implementations are implicitly heap implementations.
