@@ -1,4 +1,4 @@
-# Talks given by Kevin Gillette
+# Go talks given by Kevin Gillette
 
 Entries ordered by date of most recent presentation.
 
