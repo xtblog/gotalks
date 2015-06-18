@@ -122,7 +122,7 @@ https://github.com/xtblog/gotalks
     BenchmarkInter64K        214941 ns/op     1 allocs/op
     BenchmarkMapInter64K   10522886 ns/op   370 allocs/op
 
-- 1x alloc is from test, not library code. `BenchmarkInter*` correspond to sort.Interface-based algorithms.
+- 1x alloc is from test, not library code. `BenchmarkInter*` correspond to algorithms based around `sort.Interface`.
 - `BenchmarkMap*` correspond to straightforward, concrete map[int]struct{} algorithms.
 - Because the language only provides one way to iterate over maps (and because they're unordered), the naive implementations are about as good as you can get with maps (without having unsafe access to the map internals).
 
