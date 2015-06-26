@@ -29,7 +29,7 @@ https://github.com/xtblog/gotalks
 * Cross Compilation (3/3)
 
 - `GOOS` and `GOARCH` environment variables are used by the `go` command to select the compile target
-- GO386 and GOARM handle sub-arch tuning for those platforms (default values will likely work for you)
+- `GO386` and `GOARM` handle sub-arch tuning for those platforms (default values will likely work for you)
 - `GOARCH=386 go build` -- current OS, 386 arch
 - `GOOS=windows go build` -- Windows, same arch
 - `GOOS=linux GOARCH=arm go build` -- Android, RPi, the upcoming CHIP
