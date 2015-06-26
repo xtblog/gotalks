@@ -48,7 +48,7 @@ https://github.com/xtblog/gotalks
   package xyz
 
 - (linux OR darwin) AND (386 AND NOT customtag)
-- `go build -tag customtag` will _not_ include the above snippet in the build
+- `go build -tags customtag` will _not_ include the above snippet in the build
 - `// +build ignore` is a _conventional_ way to always exclude a file from building
 
 * Cross Compilation in Go 1.4.x and Earlier: Theory
