@@ -33,17 +33,18 @@ Entries ordered by date of most recent presentation.
 - 2014 Sep 25, Denver
 - 2015 May 13, DC
 
-## Cross-Compiling Go
-
-[Slides](https://go-talks.appspot.com/github.com/xtblog/gotalks/cross-compile.slide) | [Source](cross-compile.slide)
-
-- 2015 May 13, DC
-
 ## Unit Testing in Go
 
 [Slides](https://go-talks.appspot.com/github.com/xtblog/gotalks/unit-testing.slide) | [Source](unit-testing.slide)
 
 - 2015 May 13, DC
+
+## Cross-Compiling Go
+
+[Slides](https://go-talks.appspot.com/github.com/xtblog/gotalks/cross-compile.slide) | [Source](cross-compile.slide)
+
+- 2015 May 13, DC
+- 2015 Jun 25, Denver
 
 ## Sets and The Universal Type
 
