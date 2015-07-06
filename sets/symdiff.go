@@ -13,7 +13,7 @@ func main() {
 	data := append(a, b...)
 
 	size := set.SymDiff(data, len(a))
-	data = data[:size]
-	fmt.Println(data)
+	c := data[:size]
+	fmt.Println(c)
 	// END OMIT
 }
