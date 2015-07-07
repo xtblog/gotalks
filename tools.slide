@@ -1,0 +1,980 @@
+Exploring Go's Utility Ecosystem
+07 Jul 2015
+
+Kevin Gillette
+@kevingillette
+https://github.com/xtgo
+https://github.com/xtblog/gotalks
+
+
+* This Presentation
+
+.link http://bit.ly/go-util-talk
+
+
+* Official Toolchain
+
+- Referred to as "gc" ("the GC" refers to the garbage collector).
+
+- Consists of low level (compiler, linker) and high level (the `go` tool) toolchains.
+
+
+* Official Toolchain: High Level
+
+Supports use of gc (default) and gccgo compilers.
+
+Behavior through sub-commands: `get`, `build`, `test`, `generate`, etc.
+
+Build-related sub-commands accept some common options:
+
+- `-x` print low-level commands as they're run
+- `-n` same as `-x` but do not run the commands
+
+* Official Toolchain: Low Level
+
+- Accessed via `go tool <the-tool>`
+
+
+* Compilers: gc suite
+
+The official (and most mature) Go compiler suite.
+
+In Go 1.5, completely written in Go and consists of `compile` and `link` tools, which uniformly handle all supported targets.
+
+Also has nacl support, which can produce sandboxed binaries.
+
+Will increasingly gain access to high-level optimizations, some of which may be Go specific (and thus difficult or impractical in other compilers).
+
+
+* Compilers: gccgo
+
+.link https://tip.golang.org/doc/install/gccgo
+
+Go frontend for the GCC compiler suite. It is the second most mature Go compiler.
+
+Usually 1-2 releases behind the official compiler, and bound to GCC releases (Go 1.4 support will be part of the GCC5 release).
+
+Can target GCC's supported architectures (MIPS, ALPHA, POWERPC, etc).
+
+RTEMS support.
+
+Native GDB support.
+
+
+* Compilers: llgo
+
+.link https://github.com/go-llvm/llgo
+
+Go frontend for llvm/clang; incomplete, but under active development.
+
+Not as mature as the official compiler, but has (or may eventually have) access to some interesting targets, including PNaCL and asm.js.
+
+The llgo project includes a REPL.
+
+
+* Transpilers: GopherJS
+
+.link https://github.com/gopherjs/gopherjs
+
+Translates Go to JS
+
+Features:
+
+- Good JS interoperation support
+
+- Generates fast JS code
+
+- Sourcemap support
+
+Issues:
+
+- Large output (hello world program currently generates ~750k uncompressed JS)
+
+
+* Transpilers: TARDIS Go
+
+.link https://github.com/tardisgo/tardisgo
+
+Translates Go to HaXe
+
+HaXe in turn can transpile to C++, C#, Java, JS, PHP, and others
+
+
+* Mobile: gomobile
+
+.link https://goo.gl/qbYtyg
+
+Manages Android/iOS builds, and developer deployment and testing.
+
+Apps can be all-Go, or interface with Java or Objective-C/Swift.
+
+Fully-Go app support currently focuses on mobile game development.
+
+
+* Toolchain semantics: Internal Packages
+
+.link https://golang.org/s/go14internal
+
+`/a/internal/x` can be imported by code rooted in /a but not by code in /b
+
+Allows internal code to be factored into packages without changing public API.
+
+Available for general use in Go 1.5
+
+
+* Toolchain semantics: Custom Import Paths
+
+.link http://golang.org/cmd/go/#hdr-Remote_import_paths
+
+Repositories can be hosted on arbitrary servers:
+
+	<meta name="go-import" content="rsc.io/pdf git https://github.com/rsc/pdf">
+
+.link https://golang.org/s/go14customimport
+
+Packages available from multiple import paths can be restricted to a single path:
+
+	package pdf // import "rsc.io/pdf"
+
+The go toolchain will refuse to allow imports by any other path.
+
+
+* Toolchain semantics: Cross Compiling
+
+.link http://golang.org/pkg/go/build/
+
+.link https://tip.golang.org/doc/install/source#environment
+
+Go 1.5 has full cross-compilation capabilities built-in.
+
+Environment variables control build targets:
+
+- `GOOS` specifies target OS, ex: linux, darwin, windows...
+- `GOARCH` specifies target architecture, ex: amd64, 386, arm...
+- `GOARM` and `GO386` can alter arm and 386 builds
+
+	GOOS=openbsd GOARCH=386 go build
+
+
+* Toolchain semantics: paths
+
+The go tool (and many third-party tools), can operate on import paths.
+
+`import/path/...` is a special syntax meaning: "import/path" and all child paths.
+
+
+* Toolchain semantics: Build Tags
+
+Source files are conditionally built based on build tags. All tags are booleans.
+
+Tags corresponding to GOOS and GOARCH are set implicitly.
+
+Special filenames match these build target tags:
+
+- name_darwin_amd64.go builds only for 64-bit Intel Macs
+- name_openbsd.go builds for OpenBSD targets, regardless of architecture
+- name_386.go builds for x86 targets, regardless of OS
+
+	// +build linux,386 darwin,!cgo
+	// +build customtag
+
+	package xyz
+
+The above file will build only if: `((linux && 386) || (darwin && !cgo)) && customtag`
+
+	go build -tags customtag
+
+
+* Toolchain semantics: Execution Modes
+
+.link https://golang.org/s/execmodes
+
+- Go "plugins" loaded by Go
+- Go shared libraries loaded by Go or non-Go
+- Position-Independent Executables
+
+
+* Foreign-function Interfaces: cgo and swig
+
+.link https://golang.org/cmd/cgo/
+
+	// #cgo pkg-config: png cairo
+	// #include <png.h>
+	import "C"
+
+- "C" is a specially-handled import.
+- Support is built into the toolchain.
+- Any comment in front of the import line can specify limited inline C code.
+- Since Go is garbage collected (and may gain a moving collector), special rules are needed when dealing with Go-allocated memory.
+
+.link http://www.swig.org/Doc2.0/Go.html
+
+- Useful for linking against C++ libraries
+
+* Foreign-function Interfaces: gobind
+
+.link http://golang.org/s/gobind
+
+- Java <-> Go binding.
+- One Java class per bound Go package.
+- Java static methods can call Go functions.
+- Nested classes access types.
+- Variables accessed through getter/setters.
+
+* Style (1/2)
+
+Style is a critical aspect of Go.
+
+General code organization has some strongly established conventions:
+
+- Flatten nesting/indentation where possible.
+- Group related fields.
+- Keep identifiers short but meaningful.
+
+
+* Style (2/2)
+
+Although not part of the language proper, low-level formatting is standardized.
+
+Formatting consists of:
+
+- Brace style (partially enforced by language).
+- Indentation.
+- Field/comment alignment.
+- Expression spacing.
+
+Use of the standard formatting is expected within the community.
+
+
+* Style: gofmt overview
+
+gofmt style is _not_ configurable -- there is no room for debate.
+
+Indents only with tabs, aligns only with spaces.
+
+Code formatting is standardized around the gofmt implementation.
+
+Many editors with Go support utilize gofmt for on-save formatting.
+
+
+* Style: gofmt usage
+
+Input: gofmt can accept go code via stdin, or take files as arguments.
+
+Flags:
+
+`-w` overwrite input files (safe)
+
+`-l` list input files that will be changed
+
+`-d` print diffs to stdout
+
+`-e` print all errors (rather than just the first 10)
+
+`-s` simplify expressions:
+
+- `s[i:len(s)]` -> `s[i:]`
+- `for _ = range x { }` -> `for range x { }`
+- May make code backwards-incompatible
+
+* Style: go fmt
+
+`go fmt` when run without arguments formats `*.go` files in the current directory.
+
+`go fmt` is a more convenient, but less flexible tool compared to gofmt.
+
+Just a convenience wrapper around `gofmt -w -l *.go`
+
+
+* Style: goimports (1/2)
+
+.link http://golang.org/x/tools/cmd/goimports
+
+Mostly a superset of gofmt functionality: additionally provides import management.
+
+	package main
+
+	func main() { fmt.Println("hello world") }
+
+`goimports -w thefile.go`
+
+	package main
+
+	import "fmt"
+
+	func main() { fmt.Println("hello world") }
+
+Many editors with gofmt integration can be configured to use goimports instead.
+
+
+* Style: goimports (2/2)
+
+Import Identification:
+
+- Based on package name.
+
+- To some extent, also the exported symbols that are used.
+
+Caveats:
+
+- May require `go install` of locally developed packages for them to be recognized.
+
+- Does not necessarily play well with auto-completion (chicken-and-egg problem).
+
+- Ambiguous symbols may resolve incorrectly ("text/template" vs "html/template").
+
+- Manually writing applicable import statements can resolve these rare ambiguities.
+
+
+* Style: grind
+
+.link http://rsc.io/grind
+
+grind supplements gofmt with additional code rearrangements:
+
+- Variable declarations are moved closer to their first use
+- Normalization of variable declarations
+- Dead code is eliminated
+- goto statements are eliminated if possible
+- Unused labels are removed
+
+
+* Style: golint
+
+.link https://github.com/golang/lint
+
+Lists style suggestions/mistakes:
+
+- Doc comments on exported types
+- Properly formatted doc comments
+- Identifier naming, including capitalization of common initialisms
+- Redundant types in declarations: var f *os.File = os.Stdout
+- else block following an if statement that returns
+- `errors.New(fmt.Sprintf("..."))` instead of fmt.Errorf
+- non-normalized error messages (capitalization or punctuation present)
+
+* Documentation: go doc
+
+.link http://tip.golang.org/cmd/doc/
+
+Rewritten for Go 1.5 
+
+	go doc
+	go doc <pkg> <sym>[.<method>]   // old style
+
+	go doc <pkg>
+	go doc <sym>[.<method>]
+	go doc [<pkg>].<sym>[.<method>]
+
+All arguments are matched case-insensitively.
+
+`<pkg>` may be:
+
+- A package name: `json`
+- An import path: `text/template`
+
+
+* Documentation: godoc
+
+.link http://golang.org/x/tools/cmd/godoc
+.link http://golang.org/lib/godoc/analysis/help.html
+
+godoc -analysis type,pointer -http localhost:6060
+
+Type analysis displays:
+
+- Size and alignment (in source view)
+- Implemented interfaces
+- Method sets (useful with embedding)
+
+Pointer analysis displays:
+
+- Callers, callees (including dynamic functions)
+- Channel peers
+
+
+* Documentation: gddo
+
+.link http://godoc.org
+
+Online documentation for Go packages.
+
+Register a package by browsing to `godoc.org/<import-path>`
+
+Works with any `go get` compatible package.
+
+
+* Correctness: go vet
+
+.link http://golang.org/x/tools/cmd/vet
+
+Detects many semantic mistakes:
+
+- Package fmt (bad format strings, recursive Stringer implementations)
+
+- Variable shadowing and closure concurrency issues
+
+- Misuses of common method names (Read methods incompatible with io.Reader)
+
+- Misformatted struct and build tags
+
+- Incorrect synchronization (atomic primitives, copying locks)
+
+
+* Compile-phase options: `go build -gcflags "<flags>"`
+
+Passes options to `go tool compile` invocations.
+
+Commonly used options:
+
+- `-S` print assembly representation of generated code
+- `-m` print optimization decisions
+
+Run `go tool compile -h` for a list of possible flags.
+
+* Link-phase options: `go build -ldflags "<flags>"`
+
+Passes options to `go tool link` invocations.
+
+`-X` allows a string _variable_ (not constant) to be replaced with a new value.
+
+	package main
+	var version string
+
+Overwrite this variable's value with:
+
+	go build -ldflags "-X main.version da39a3"
+
+Code generation will often be better than using the `-X` linker flag.
+
+Run `go tool link -h` for a list of possible flags.
+
+
+* Refactoring: gofmt
+
+	gofmt -r '(a) -> a'
+
+Rewrite semantics:
+
+- Left and right sides must be valid Go expressions
+- Single lowercase letter identifiers are treated as wildcards
+- Lexical (syntax) safety is guaranteed, but not type safety
+- The left side matches a full expression
+- The above example will replace all *unnecessary* parentheses
+
+
+* Refactoring: gorename
+
+.link http://golang.org/x/tools/cmd/gorename
+
+Type-safe identifier renaming.
+
+	gorename -help
+
+`-from` and `-to` switches specify transformation.
+
+`-offset` is more specific, and intended for use by editors.
+
+	gorename -from thefile.go::Old -to New
+
+
+* Refactoring: eg
+
+Example based expression refactoring. Type safe for common cases.
+
+template.go:
+
+	package p
+	import ( "fmt"; "errors" )
+	func before(s string) error { return fmt.Errorf("%s", s) }
+	func after(s string)  error { return errors.New(s) }
+
+Run:
+
+	eg -t template.go input.go
+
+Transformation:
+
+	err := fmt.Errorf("%s", "error: " + msg)  // before
+	err := errors.New("error: " + msg)        // after
+
+
+* Testing: go test
+
+	import "testing"
+
+	func TestCamelCaseName(t *testing.T) { /* ... */ }
+
+	func TestCamelCaseName_subtest(t *testing.T) { /* ... */ }
+
+
+* Testing: example tests (1/2)
+
+	func ExamplePrintHello() {
+		PrintHello()
+
+		// Output: hello world
+	}
+
+- Serves as both a test and documentation.
+- The name is of the example function is important!
+- The above example will display an interactive example in godoc, associated with `PrintHello`.
+- A special `// Output:` comment compares against the example's stdout.
+- Leading and trailing whitespace is trimmed prior to comparison.
+
+
+* Testing: example tests (2/2)
+
+	func ExampleTypeFuncOrGlobal() { /* ... */ }
+
+	func ExampleType_Method() { /* ... */ }
+
+	func ExampleType_Method_subexample1() { /* ... */ }
+
+- Like regular tests, example names can have an "_xyz123" suffix for sub-examples.
+- The suffix must _not_ begin with an uppercase letter.
+
+
+* Testing: cover
+
+.link https://blog.golang.org/cover
+
+Test coverage measurement for Go.
+
+	go test -cover
+
+	go test -coverprofile=coverage.out
+	go tool cover -html=coverage.out
+
+
+* Testing: goconvey
+
+.link http://goconvey.co/
+
+Behavioral tests, with an optional Web UI.
+
+
+* Continuous Integration: direct Go support
+
+.link http://nathany.com/go-testing-toolbox/ Nathan Youngman's Overview
+
+drone.io:
+
+.link http://docs.drone.io/golang.html
+
+Travis CI:
+
+.link http://docs.travis-ci.com/user/languages/go/
+
+
+* Continuous Integration: indirect Go support
+
+Coveralls (continuous coverage reporting):
+
+.link https://github.com/mattn/goveralls
+
+.link http://jmcvetta.github.io/blog/2013/08/30/continuous-integration-for-go-code/
+
+go2xunit assists with Jenkins integration:
+
+.link https://bitbucket.org/tebeka/go2xunit/overview
+
+Circle CI can test arbitrary Docker containers:
+
+.link https://circleci.com/features
+
+
+* Benchmarking: `go test -bench .`
+
+	func BenchmarkName(b *testing.B) {
+		// do initialization
+		b.ResetTimer()
+
+		for i := 0; i < b.N; i++ {
+			// run code to benchmark
+		}
+	}
+
+- Adaptively measured (maths) benchmarks for Go.
+- *Always* use the above `b.N` loop form.
+
+
+* Benchmarking: benchcmp
+
+.link http://golang.org/x/tools/cmd/benchcmp
+
+Historically used to identify performance regressions.
+
+Compares the output from two go benchmark runs.
+
+	$ go test -run=NONE -bench=. ./... > old.txt
+	$ # make changes
+	$ go test -run=NONE -bench=. ./... > new.txt
+
+	$ benchcmp old.txt new.txt
+	benchmark           old ns/op     new ns/op     delta
+	BenchmarkConcat     523           68.6          -86.88%
+
+
+* Benchmarking: benchstat
+
+.link http://rsc.io/benchstat
+
+Mostly a replacement for benchcmp.
+
+Now used fairly exclusively within the core Go team.
+
+benchstat output is statistically more meaningful than benchcmp.
+
+	$ benchstat old.txt new.txt
+	name        old time/op  new time/op  delta
+	GobEncode   13.6ms ± 1%  11.8ms ± 1%  -13.31% (p=0.016 n=4+5)
+	JSONEncode  32.1ms ± 1%  31.8ms ± 1%     ~    (p=0.286 n=4+5)
+
+
+* Profiling
+
+.link http://blog.golang.org/profiling-go-programs
+
+	go test -bench . -cpuprofile=cpu.out
+
+	go test -bench . -memprofile=mem.out
+
+Profiling flags will produce a test binary (compared against profiling output).
+
+	go tool pprof <testbinary> <profile.out>
+
+Run cpu and mem profiles separately (or they'll profile each other and distort results).
+
+pprof is an interactive tool:
+
+- The `web` command will show a browser-navigable graph.
+- The `top10` command will show the top 10 hotspots.
+
+
+* Data Races
+
+.link http://research.swtch.com/gorace
+
+- Data races involve a write that is concurrent (but not synchronized) with at least one other write or read of the same data.
+
+- Races may cause data corruption, in stored form and/or observed form.
+
+- In the absence of writes, unsynchronized concurrent reads are always safe.
+
+- The "sync" package (Mutex, RWMutex) and the "sync/atomic" package (StoreInt32, LoadInt64) can be used to synchronize accesses to shared memory.
+
+- Channels can be used to share data without sharing memory; when used correctly, channel-based algorithms are not vulnerable to memory-level data races.
+
+
+* Race Detection
+
+.link http://blog.golang.org/race-detector
+
+- Go provides an optional runtime race detector, which detects _memory_ races.
+
+- Higher level races (unsynchronized writes to a file/connection) are not detected.
+
+- No false positives, but in some extreme cases may produce false negatives.
+
+- Causes an exit with a very useful stack trace when races detected.
+
+- `go test -race` and `go run -race` are commonly used.
+
+- Many other `go` toolchain subcommands also support `-race`
+
+- `-race` builds a modified runtime: some overhead, not for production use.
+
+
+* Static Analysis: callgraph
+
+.link golang.org/x/tools/cmd/callgraph
+
+Multiple algorithms with speed-vs-precision tradeoffs.
+
+The default algorithm can identify dynamic callees.
+
+Multiple output formats: graphviz, digraph, custom textual output.
+
+
+* Static Analysis: digraph
+
+Each line in the digraph format specifies one or more directed edges.
+
+	"quoted label" separate labels
+
+Is the same as:
+
+	"quoted label" separate
+	"quoted label" labels
+
+The digraph command allows digraph input (via stdin) to be queried in various ways.
+
+Useful for examining callgraphs and `go list` output (package dependencies).
+
+Reusable for your own purposes.
+
+
+* Static Analysis: oracle
+
+.link http://golang.org/x/tools/cmd/oracle
+
+A useful tool for answering many questions about Go code:
+
+- What is the resulting type of this expression?
+- What are the fields/methods of that type?
+- What are the dynamic callers/callees of a function?
+- Where does this pointer/reference type point? (initialization points)
+- What are this channels peers?
+
+Oracle has good integration support in many editors.
+
+
+* Fuzz Testing: go-fuzz
+
+.link http://github.com/dvyukov/go-fuzz
+
+Go-specific fuzz testing, heavily based on American Fuzzy Lop (AFL).
+
+Adaptive, not brute-force. High quality results much faster than traditional fuzzing.
+
+Has found hundreds of bugs in the Go stdlib and tools.
+
+(AFL has found many bugs in high-profile C/C++ projects).
+
+	func Fuzz(data []byte) int { /* implement logic here */ }
+
+Return values: 0 == invalid input, 1 == valid input, 2 == valid but "interesting"
+
+
+* Code Generation: go generate
+
+.link https://blog.golang.org/generate
+
+Code generation tool for package *authors*.
+
+_Not_ part of the build process -- it's part of the development process.
+
+Run with:
+
+	go generate
+
+The result of code generation is part of the codebase (commit it).
+
+	//go:generate command arg1 arg2
+
+Package generate directives will be run in filename order, top-to-bottom.
+
+
+* Code Generation: stringer
+
+.link http://golang.org/x/tools/cmd/stringer
+
+	//go:generate stringer -type=SomeType
+
+Used to generate a `String()` method for a type with `iota` constants.
+
+
+* Code Generation: gen (clipperhouse)
+
+.link https://github.com/clipperhouse/gen
+
+- LICENSE: BSD, portions MIT
+
+Generates methods for performing LINQ-style queries on arbitrary types.
+
+
+* Code Generation: re2dfa
+
+.link https://github.com/opennota/re2dfa
+
+- LICENSE: GPLv3
+
+Generates a finite state machine from a regexp input.
+
+
+* Debugging: Execution Tracer
+
+.link http://golang.org/s/go15trace
+
+.link https://talks.golang.org/2015/state-of-go-may.slide#17
+
+Detailed, combined profiling data.
+
+
+* Debugging: gdb
+
+.link https://golang.org/doc/gdb
+
+With some effort, Go binaries can be debugged using gdb:
+
+- Building without optimizations and inlining may aid debugging with gdb
+
+- A gdb extension script bundled with the Go toolchain provides further capabilities
+
+
+* Debugging: delve
+
+.link https://github.com/derekparker/delve
+
+Debugger designed specifically for Go.
+
+Much higher level, cleaner debugging experience compared to gdb.
+
+Still in development.
+
+
+* Vendoring: godep
+
+.link https://github.com/tools/godep
+
+Stores dependency information in Godeps directory.
+
+May optionally use import path rewriting to isolate dependencies.
+
+
+* Vendoring: wgo
+
+.link https://github.com/skelterjohn/wgo
+
+wgo wraps the existing go tool with a workspace concept.
+
+Supports migration of godep projects into wgo projects.
+
+Vendors code into `vendor` directory alongside a `.gocfg` manifest.
+
+
+* Vendoring: gb
+
+.link http://getgb.io
+
+.link http://go-talks.appspot.com/github.com/davecheney/presentations/reproducible-builds.slide Presentation
+
+Zero-conf reproducible builds without import or GOPATH manipulation.
+
+Nearest parent containing `src` directory will be considered the project root.
+
+`vendor` directory in project root contains vendored dependencies.
+
+May be able to solve -installsuffix issues more quickly than the go tool.
+
+Caveats:
+
+- Opinionated, alternative high-level toolchain
+
+- GB projects cannot be fetched with `go get`
+
+
+* Vendoring: Go 1.5 vendor support
+
+.link http://golang.org/s/go15vendor
+
+Experimental `-vendor` bool flag being added to `get`, `build`, and other subcommands.
+
+If an ancestor has a `vendor` directory, it will be treated as an implicit GOPATH entry.
+
+May be promoted to default behavior in 1.6 or later.
+
+
+* Vendoring: glock
+
+.link https://github.com/robfig/glock
+
+glock uses VCS hooks to synchronize dependencies across a team.
+
+
+* Vendoring: gpm and gvp
+
+.link https://github.com/pote/gpm
+
+gpm uses manifest file (Godeps) to track dependency revisions.
+
+.link https://github.com/pote/gvp
+
+gvp manages GOPATH to isolate dependencies.
+
+gpm and gvp can be used independently, but are designed to work together.
+
+
+* Vendoring: glide
+
+.link https://github.com/Masterminds/glide
+
+glide is similar to gpm and gvp, integrated into a single tool.
+
+Support for "aliased" packages (managing package forks).
+
+
+* Vendoring: gvm
+
+.link https://github.com/moovweb/gvm
+
+gvm can install and manage multiple Go toolchain versions.
+
+Project dependencies are vendored into "package sets."
+
+
+* Vendoring: others
+
+.link https://github.com/golang/go/wiki/PackageManagementTools
+
+
+* Present
+
+.link https://godoc.org/golang.org/x/tools/cmd/present
+
+Presentation tool written by gophers for Go presentations.
+
+(This talk uses the present format)
+
+Some features:
+
+- Slide and article presentation formats using a unified syntax
+
+- Editable, interactive Go code
+
+Online viewing:
+
+.link https://go-talks.appspot.com
+
+
+
+
+* Build and run: `go run`
+
+`go run` requires one or more Go source files to be specified.
+
+Caveats:
+
+- File-granular compilation inconsistent with other tools' package-granularity
+
+- Does *not* support shebang scripts: `#!/path/to/interpreter`
+
+- Requires compiler/toolchain to be present alongside deployment
+
+- Rebuilds the binary _every_ invocation; may have substantial cost for CLI apps
+
+- Not intended and not suitable for use in production
+
+- `go build && ./thebinary` is better for all non-trivial tasks
+
+
+* Build and run: gorun
+
+.link https://wiki.ubuntu.com/gorun
+
+Similar to `go run` with some improvements:
+
+- Limited to single-file scripts (single-file), including shebang support
+
+- Safely caches compilation, self-cleaning
+
+And some limitations:
+
+- Use of shebang makes other tools fail (gofmt, autocompletion, official toolchain)
+
+- Code cannot grow beyond a single file: still not suitable for non-trivial tasks
+
+- Still requires compiler at deployment location
+
+- gorun scripts should not be mixed with other Go files, and no point for .go suffix
