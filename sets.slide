@@ -126,6 +126,7 @@ A custom ordered-map implementation could eliminate the performance barriers, bu
 
 Can we avoid these compromises and performance issues altogether?
 
+To answer this question, we can look a Go stdlib package that faced a similar problem, and devised a simple, yet elegant solution.
 
 * Sorting in Go
 
