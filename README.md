@@ -50,4 +50,4 @@ Entries ordered by date of most recent presentation.
 
 [Slides](https://go-talks.appspot.com/github.com/xtblog/gotalks/sets.slide) | [Source](sets.slide)
 
-- 2015 July 10, Denver (GopherCon Hack Day)
+- 2015 July 7, Denver (GopherCon Pre-Party)
