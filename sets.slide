@@ -166,21 +166,23 @@ An ordering can be defined on sets too:
 
 .link https://github.com/xtgo/set
 
-- Every `sort.Interface` implementation is implicitly a set implementation
-- `sort.Sort` and `set.Uniq` sanitize arbitrary inputs
-- `set.Union` and friends implement the set operations
-- Absolutely _no_ reflection, type assertions, empty interfaces, or code generation
+- Every `sort.Interface` implementation is implicitly a set implementation.
+- `sort.Sort` and `set.Uniq` sanitize arbitrary inputs. None, either, or both may be used depending on how "prepared" the inputs already are.
+- `set.Union` and friends implement the set operations.
+- Absolutely _no_ reflection, type assertions, empty interfaces, or code generation.
 
 
 * Sets in Go: a different approach (2/4)
 
     func SymDiff(data sort.Interface, pivot int) (size int)
 
-`pivot` *delimits* the two input sets.
+`pivot` *delimits* the two *concatenated* input sets.
 
 .play sets/symdiff.go /BEGIN/,/END/
 
 .image sets/slice.png
+
+Set semantics are merely *slice* semantics.
 
 
 * Sets in Go: a different approach (3/4)
@@ -199,7 +201,7 @@ An ordering can be defined on sets too:
 
 Concurrent, adaptive application of `op` to all of the input sets.
 
-`op` must be semantically associative; doc examples show `set.Diff` approach.
+`op` must be mathematically associative; doc examples show `set.Diff` approach.
 
 .play sets/apply.go /BEGIN/,/END/
 
@@ -207,6 +209,7 @@ Concurrent, adaptive application of `op` to all of the input sets.
 * Good in theory, but in practice? (1/3)
 
 - Doesn't allocate internally (map implementations do)
+- The control and flexibility of slice semantics apply equally to slice-based sets
 - Much faster than map-based algorithms for set-to-set operations
 - Map-based algos get slower with set size; no so for the slice-based algorithms
 
@@ -228,14 +231,6 @@ Concurrent, adaptive application of `op` to all of the input sets.
 - 1x alloc is from test, not library code. `BenchmarkInter*` correspond to algorithms based around `sort.Interface`
 
 
-* Additional Possibilities
-
-Many data-structures with a definable order could have sort-style algorithms.
-
-`[]int` is a good surrogate data-structure that can be used to form more complex algorithms on top of "concrete method" interfaces.
-
-ex: merge sort and specialized sorts API-compatible with `sort.Sort`
-
 * Additional Possibilities: shuffle algorithm
 
 .play sets/shuffle.go /BEGIN/,$
@@ -247,6 +242,15 @@ ex: merge sort and specialized sorts API-compatible with `sort.Sort`
 - Pivots would allow batch pushes and pops -- potentially much more efficient
 - Type assertions and redundant methods go away
 - Thus, all sort.Interface implementations could implicitly be heap implementations
+
+
+* Additional Possibilities
+
+Many data-structures with a definable order could have sort-style algorithms.
+
+`[]int` is a good surrogate data-structure that can be used to form more complex algorithms on top of "concrete method" interfaces.
+
+ex: merge sort and specialized sorts API-compatible with `sort.Sort`
 
 
 * Thanks (in chronological order)
