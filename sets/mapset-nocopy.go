@@ -37,8 +37,10 @@ func main() {
 
 func (s StringSet) String() string {
 	lst := make(sort.StringSlice, 0, len(s))
-	for k := range s {
-		lst = append(lst, k)
+	for k, ok := range s {
+		if ok {
+			lst = append(lst, k)
+		}
 	}
 	sort.Sort(lst)
 	return fmt.Sprint(lst)
