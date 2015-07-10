@@ -1,0 +1,109 @@
+Sets and The Universal Type
+Safely solving more problems with the same language tools
+10 Jul 2015
+
+Kevin Gillette
+@kevingillette
+https://github.com/xtgo
+https://github.com/xtblog/gotalks
+
+* Introduction
+
+- Maps in Go work well for membership testing.
+- Maps break down when implementing set algorithms like intersection, union, etc.
+- Go's stdlib "sort" reached a simple, elegant solution to a similar problem.
+
+* Sorting in Go
+
+A polymorphic, type-safe, single algorithm implementation. But how?
+
+- Interfaces, implemented on the collection, not the element
+- The methods parameters and return values are all concrete types (important!)
+
+    type Interface interface {
+        Len() int
+        Less(i, j int) bool
+        Swap(i, j int)
+    }
+
+.link http://golang.org/pkg/sort/#Interface
+
+
+* The Universal Type (1/2)
+
+Sorting is necessarily based around the concept of order:
+
+- Any fully-ordered collection can be enumerated
+- `int` represents an index; it is a proxy for the real value (brilliant!)
+
+    type IntSlice []int
+
+    func (p IntSlice) Len() int           { return len(p) }
+    func (p IntSlice) Less(i, j int) bool { return p[i] < p[j] }
+    func (p IntSlice) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
+
+.link http://golang.org/pkg/sort/#IntSlice
+
+
+* The Universal Type (2/2)
+
+An ordering can be defined on sets too:
+
+- Nearly all practical sets have order defined on the element type anyway
+- Example: sets of ints, sets of strings, sets of structs, etc.
+
+
+* Sets in Go: a different approach (1/3)
+
+    func SymDiff(data sort.Interface, pivot int) (size int)
+
+`pivot` *delimits* the two *concatenated* input sets.
+
+.play sets/symdiff.go /BEGIN/,/END/
+
+.image sets/slice.png
+
+Set semantics are merely *slice* semantics.
+
+
+* Sets in Go: a different approach (2/3)
+
+    type Op func(data sort.Interface, pivot int) (size int)
+
+    func Apply(op Op, data sort.Interface, pivots []int) (size int)
+
+Concurrent, adaptive application of `op` to all of the input sets.
+
+.play sets/apply.go /BEGIN/,/END/
+
+
+* Sets in Go: a different approach (3/3)
+
+.link https://github.com/xtgo/set
+
+- Every `sort.Interface` implementation is implicitly a set implementation.
+- `sort.Sort` and `set.Uniq` sanitize arbitrary inputs. None, either, or both may be used depending on how "prepared" the inputs already are.
+- `set.Union` and friends implement the set operations.
+- Absolutely _no_ reflection, type assertions, empty interfaces, or code generation.
+
+
+* Good in theory, but in practice?
+
+    BenchmarkInter32            199 ns/op     1 allocs/op
+    BenchmarkMapInter32        5530 ns/op     6 allocs/op
+
+- All of these algorithms will be made even faster by baking in binary search to detect runs
+
+
+* Additional Possibilities: container/heap
+
+- container/heap uses of `interface{}` could have been `pivot` and `size` ints.
+- Tree algorithms fit into this style of interface.
+- 10 line slice shuffle algorithm using a sort.Interface proxy.
+
+
+* Thanks (in chronological order)
+
+- Cory LaNou
+- Luna Duclos
+- Dave Cheney
