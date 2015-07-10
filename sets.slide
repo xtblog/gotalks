@@ -243,9 +243,9 @@ Concurrent, adaptive application of `op` to all of the input sets.
 .play sets/shuffle.go /BEGIN/,$
 
 
-* Additional Possibilities: container/list
+* Additional Possibilities: container/heap
 
-- container/list uses of `interface{}` could have been `pivot` and `size` ints
+- container/heap uses of `interface{}` could have been `pivot` and `size` ints
 - Pivots would allow batch pushes and pops -- potentially much more efficient
 - Type assertions and redundant methods go away
 - Thus, all sort.Interface implementations could implicitly be heap implementations
