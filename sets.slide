@@ -223,8 +223,8 @@ Concurrent, adaptive application of `op` to all of the input sets.
 
 * Good in theory, but in practice? (2/3)
 
-- TODO: will be made even faster by baking in binary search to detect runs
-- TODO: set.Union and set.SymDiff currently use multi-pass implementations with reasonable speed -- these will get replaced with much faster, single pass techniques like set.Inter and set.Diff already use
+- set.Union and set.SymDiff currently use multi-pass implementations with reasonable speed -- these will get replaced with much faster, single pass techniques like set.Inter and set.Diff already use
+- All of these algorithms will be made even faster by baking in binary search to detect runs
 
 
 * Good in theory, but in practice? (3/3)
