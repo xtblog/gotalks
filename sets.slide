@@ -7,12 +7,6 @@ Kevin Gillette
 https://github.com/xtgo
 https://github.com/xtblog/gotalks
 
-* Introduction
-
-Hello, I'm Kevin. I'm a local Denver Gopher, but I also work with Bill Kennedy and the Ardan Labs team to teach Go.
-
-I'm going to talk a bit about sets.
-
 * Sets in Go
 
 - Often implemented as `map[T]struct{}` or `map[T]bool`
