@@ -74,11 +74,11 @@ https://github.com/xtblog/gotalks
 * Error-Handling Verbosity (3/3)
 
     func WriteEmphatically(w io.Writer, p []byte) error {
-        sw := &SafeWriter{
-        io.WriteString(w, "Hey you: ")
-        w.Write(p)
-        _, err = io.WriteString(w, "!!!\n")
-        return err
+        sw := NewSafeWriter(w)
+        io.WriteString(sw, "Hey you: ")
+        sw.Write(p)
+        io.WriteString(sw, "!!!\n")
+        return sw.Err()
     }
 
 - bufio.Writer caches errors and behaves similarly; technique of checking error only on Flush used by various stdlib packages.
