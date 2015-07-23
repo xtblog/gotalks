@@ -14,12 +14,6 @@ Entries ordered by date of most recent presentation.
 
 - 2014 Jun 26, Denver
 
-## Effective Go Error Handling
-
-[Slides](https://go-talks.appspot.com/github.com/xtblog/gotalks/error-handling.slide) | [Source](error-handling.slide)
-
-- 2014 Sep 25, Denver
-
 ## Open Source Go Library Development
 
 [Slides](https://go-talks.appspot.com/github.com/xtblog/gotalks/open-source.slide) | [Source](open-source.slide)
@@ -46,8 +40,21 @@ Entries ordered by date of most recent presentation.
 - 2015 May 13, DC
 - 2015 Jun 25, Denver
 
+## Exploring Go's Utility Ecosystem
+
+[Slides](https://go-talks.appspot.com/github.com/xtblog/gotalks/tools.slide) | [Source](tools.slide)
+
+- 2015 Jul 7, Denver (GopherCon Workshop)
+
 ## Sets and The Universal Type
 
 [Slides](https://go-talks.appspot.com/github.com/xtblog/gotalks/sets.slide) | [Source](sets.slide)
 
-- 2015 July 7, Denver (GopherCon Pre-Party)
+- 2015 Jul 7, Denver (GopherCon Pre-Party)
+
+## Effective Go Error Handling
+
+[Slides](https://go-talks.appspot.com/github.com/xtblog/gotalks/error-handling.slide) | [Source](error-handling.slide)
+
+- 2014 Sep 25, Denver
+- 2015 Jul 23, Miami Meetup
