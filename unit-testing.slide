@@ -1,5 +1,5 @@
 Unit Testing in Go
-13 May 2015
+27 Aug 2015
 
 Kevin Gillette
 @kevingillette
@@ -100,3 +100,4 @@ https://github.com/xtblog/gotalks
 
 .link http://blog.golang.org/profiling-go-programs Go Blog Profiling Article
 .link https://blog.golang.org/cover Go Blog Coverage Article
+.link https://blog.golang.org/examples Go Blog Testable Examples Article
