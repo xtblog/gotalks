@@ -56,7 +56,7 @@ Element type is theoretically inconsequential, but can practical consequences:
 
 We can choose to give the user convenience or control.
 
-We can provide both at the expense of code volume.
+We can provide both at the expense of code/API volume.
 
 We can alternatively provide both at the expense of API complexity:
 
@@ -114,9 +114,9 @@ We can use code-generation.
 
 map-based sets in Go are not competitive with other languages' "native" sets.
 
-Go maps have excellent element-access performance, but the undefined iteration order greatly restricts the quality of the algorithms that can be used.
+Go maps have excellent element-access performance, but the undefined iteration order greatly restricts the quality of the algorithms that can be used for the other set operations.
 
-A custom ordered-map implementation could eliminate the performance barriers, but would likely have the same tradeoffs as regular maps.
+A custom ordered-map implementation could eliminate some performance barriers, but would likely have the same tradeoffs as regular maps.
 
 Can we avoid these compromises and performance issues altogether?
 
@@ -127,7 +127,7 @@ To answer this question, we can look a Go stdlib package that faced a similar pr
 A polymorphic, type-safe, single algorithm implementation. But how?
 
 - Interfaces, implemented on the collection, not the element
-- The methods parameters and return values are all concrete types (important!)
+- The methods' parameters and return values are all concrete types (important!)
 
     type Interface interface {
         Len() int
@@ -249,7 +249,7 @@ Concurrent, adaptive application of `op` to all of the input sets.
 
 Many data-structures with a definable order could have sort-style algorithms.
 
-`[]int` is a good surrogate data-structure that can be used to form more complex algorithms on top of "concrete method" interfaces.
+`[]int` is a good proxy data-structure that can be used to form more complex algorithms on top of "concrete method" interfaces.
 
 ex: merge sort and specialized sorts API-compatible with `sort.Sort`
 
